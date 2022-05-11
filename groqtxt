@@ -1,0 +1,328 @@
+Get Image from Lock
+*[_type=='lock' && name == 'McAlpine'][0]{"URL":coverPhoto.asset->url}
+
+
+
+Get all lock "Auxiliary" chambers from locks with "River Name"
+
+*[_type=='lock']{
+  "Lock Name":name,
+ 
+"River":river->name,
+  chamber[chamber==
+  'auxiliary'
+  ]{chamber,gateType,length,width,lift,"side":location}
+}
+
+https://95hkobgg.api.sanity.io/v2021-03-25/data/query/production?query=%0A*%5B_type%3D%3D'lock'%5D%7B%0A%20%20%22Lock%20Name%22%3Aname%2C%0A%20%0A%22River%22%3Ariver-%3Ename%2C%0A%20%20chamber%5Bchamber%3D%3D%0A%20%20'auxiliary'%0A%20%20%5D%7Bchamber%2CgateType%2Clength%2Cwidth%2Clift%2C%22side%22%3Alocation%7D%0A%7D%0A&%24Ohio=%22549525c7-384c-4779-831d-0ab4b3431d89%22&%24Kanawha=%224b7467b1-4cef-4650-9cd5-8e0b45025ba4%22&%24Louisville=%223d8aa5c6-1689-436a-86ee-15d81f117976%22&%24Huntington=%22f8c9adfb-4380-4afd-8d03-7e74454a946a%22
+
+Get all lock "Auxiliary" chambers from locks.
+
+*[_type=='lock']{
+  name,
+  chamber[chamber==
+  'auxiliary'
+  ]
+}
+
+
+
+Get all "Auxiliary" chamber "upstream" gate types.
+
+
+*[_type=='lock']{
+  lock_name,
+ "Gate Type": chamber[chamber==
+  'auxiliary'
+  ]['gateType'][0][location =='upstream']['gateType']
+}
+******************************************************
+
+RAW GROQ
+
+*[_type=='lock']{
+  lock_name,
+ "Auxilary Upstream Gate Type": chamber[chamber==
+  'auxiliary'
+  ]['gateType'][0][location =='upstream']['gateType'][0],
+  
+   "Auxilary Upstream Gate Installed": chamber[chamber=='auxiliary']['gateType'][0][location =='upstream']['yearInService'][0],
+  
+"Gate Age":2022-chamber[chamber=='auxiliary']['gateType'][0][location =='upstream']['yearInService'][0] ,
+
+}
+
+QUERY URL:https://95hkobgg.api.sanity.io/v1/data/query/production?query=%0A*%5B_type%3D%3D'lock'%5D%7B%0A%20%20lock_name%2C%0A%20%22Auxilary%20Upstream%20Gate%20Type%22%3A%20chamber%5Bchamber%3D%3D%0A%20%20'auxiliary'%0A%20%20%5D%5B'gateType'%5D%5B0%5D%5Blocation%20%3D%3D'upstream'%5D%5B'gateType'%5D%5B0%5D%2C%0A%20%20%0A%20%20%20%22Auxilary%20Upstream%20Gate%20Installed%22%3A%20chamber%5Bchamber%3D%3D'auxiliary'%5D%5B'gateType'%5D%5B0%5D%5Blocation%20%3D%3D'upstream'%5D%5B'yearInService'%5D%5B0%5D%2C%0A%20%20%0A%22Gate%20Age%22%3A2022-chamber%5Bchamber%3D%3D'auxiliary'%5D%5B'gateType'%5D%5B0%5D%5Blocation%20%3D%3D'upstream'%5D%5B'yearInService'%5D%5B0%5D%20%2C%0A%0A%7D%0A
+
+OUTPUT:"result":[4 items
+0:{4 items
+"Auxilary Upstream Gate Installed":2020
+"Auxilary Upstream Gate Type":"miter"
+"Gate Age":2
+"lock_name":"McAlpine"
+}
+1:{4 items
+"Auxilary Upstream Gate Installed":1959
+"Auxilary Upstream Gate Type":"miter"
+"Gate Age":63
+"lock_name":"Markland"
+}
+2:{4 items
+"Auxilary Upstream Gate Installed":1974
+"Auxilary Upstream Gate Type":"miter"
+"Gate Age":48
+"lock_name":"Newburgh"
+}
+3:{4 items
+"Auxilary Upstream Gate Installed":1973
+"Auxilary Upstream Gate Type":"miter"
+"Gate Age":49
+"lock_name":"Cannelton"
+}
+]
+
+
+// Get all the district names and the associated rivers
+
+https://95hkobgg.api.sanity.io/v1/data/query/production?query=%0A*%5B_type%20%3D%3D'district'%5D%7Bdistrict_long_name%2Criver%5B0..3%5D-%3E%7Bname%7D%7D%0A%0A&%24Ohio=%22549525c7-384c-4779-831d-0ab4b3431d89%22&%24Kanawha=%224b7467b1-4cef-4650-9cd5-8e0b45025ba4%22
+
+*[_type =='district']{district_long_name,river[0..3]->{name}}
+
+OUTPUT: "result":[2 items
+0:{2 items
+"district_long_name":"Louisville"
+"river":[2 items
+0:{...
+}1 item
+1:{...
+}1 item
+]
+}
+1:{2 items
+"district_long_name":"Huntington"
+"river":[2 items
+0:{...
+}1 item
+1:{...
+}1 item
+]
+}
+]
+
+
+**************************** Ohio River Grounding / accident 2000-2021 *****************************************
+
+*[riverCode == "OH" && reasonCode match "accident" || reasonCode match "grounding"]
+
+https://95hkobgg.api.sanity.io/vX/data/query/production?query=*%5BriverCode%20%3D%3D%20%22OH%22%20%26%26%20reasonCode%20match%20%22accident%22%20%7C%7C%20reasonCode%20match%20%22grounding%22%5D&%24Ohio=%22549525c7-384c-4779-831d-0ab4b3431d89%22&%24Kanawha=%224b7467b1-4cef-4650-9cd5-8e0b45025ba4%22
+
+
+
+*[_type=='division' ]{division_short_name,
+                     "Districts":*[_type=="district"]{district_long_name,
+                      
+"Rivers":*[_type=="river"]{name,"Locks":*[_type=="lock"]},district_short_name},
+"Chamber":*[_type=="chamber"],
+"River2":*[_type=='river']
+}
+
+*************************************Locks by Districts****************************
+https://95hkobgg.api.sanity.io/v2021-03-25/data/query/production?query=*%5B_type%3D%3D%22district%22%5D%7Bdistrict_long_name%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%22Locks%3A%20%22%3A*%5B_type%3D%3D'lock'%20%26%26%20references(%5E._id)%5D.lock_name%7D&%24Ohio=%22549525c7-384c-4779-831d-0ab4b3431d89%22&%24Kanawha=%224b7467b1-4cef-4650-9cd5-8e0b45025ba4%22
+
+*[_type=="district"]{district_long_name,
+                    "Locks: ":*[_type=='lock' && references(^._id)].lock_name}
+
+**************** Results ****************************
+"result":[2 items
+0:{2 items
+"Locks: ":[9 items
+0:
+"Green River Lock & Dam 2"
+1:
+"McAlpine"
+2:
+"Markland"
+3:
+"John T. Myers"
+4:
+"Newburgh"
+5:
+"Cannelton"
+6:
+"Green River Lock & Dam 1"
+7:
+"Smithland"
+8:
+"Olmsted"
+]
+"district_long_name":"Louisville"
+}
+1:{2 items
+"Locks: ":[9 items
+0:
+"Marmet"
+1:
+"Greenup"
+2:
+"Willow Island"
+3:
+"Meldahl"
+4:
+"Belleville"
+5:
+"London"
+6:
+"Winfield"
+7:
+"Robert C. Byrd"
+8:
+"Racine "
+]
+"district_long_name":"Huntington"
+}
+]
+
+****** All Lock in Louisville on the Ohio ******
+
+https://95hkobgg.api.sanity.io/v2021-03-25/data/query/production?query=*%5B_type%3D%3D%22lock%22%20%26%26%20references(%24Louisville)%20%26%26%20references(%24Ohio)%5D%7Block_name%7D%0A&%24Ohio=%22549525c7-384c-4779-831d-0ab4b3431d89%22&%24Kanawha=%224b7467b1-4cef-4650-9cd5-8e0b45025ba4%22&%24Louisville=%223d8aa5c6-1689-436a-86ee-15d81f117976%22
+
+*[_type=="lock" && references($Louisville) && references($Ohio)]{lock_name}
+
+******* PARAMS{Ohio:'549525c7-384c-4779-831d-0ab4b3431d89',Kanawha:'4b7467b1-4cef-4650-9cd5-8e0b45025ba4',Louisville:"3d8aa5c6-1689-436a-86ee-15d81f117976"
+}
+
+******* Results
+Query URL [copy]
+
+1
+
+*[_type=="lock" && references($Louisville) && references($Ohio)]{lock_name}
+
+2
+
+​
+
+1
+
+{Ohio:'549525c7-384c-4779-831d-0ab4b3431d89',Kanawha:'4b7467b1-4cef-4650-9cd5-8e0b45025ba4',Louisville:"3d8aa5c6-1689-436a-86ee-15d81f117976"
+
+2
+
+}
+
+"result":[7 items
+0:{1 item
+"lock_name":"McAlpine"
+}
+1:{1 item
+"lock_name":"Markland"
+}
+2:{1 item
+"lock_name":"John T. Myers"
+}
+3:{1 item
+"lock_name":"Newburgh"
+}
+4:{1 item
+"lock_name":"Cannelton"
+}
+5:{1 item
+"lock_name":"Smithland"
+}
+6:{1 item
+"lock_name":"Olmsted"
+}
+]
+
+
+*****All Ohio River Locks with District Name and River Mile ******
+
+https://95hkobgg.api.sanity.io/v2021-03-25/data/query/production?query=*%5B_type%3D%3D%22district%22%20%26%26%20references(%24Ohio)%5D%7Bdistrict_long_name%2CdistrictLock%5B%5D-%3E%7Block_name%2Criver_mile%7D%7D&%24Ohio=%22549525c7-384c-4779-831d-0ab4b3431d89%22&%24Kanawha=%224b7467b1-4cef-4650-9cd5-8e0b45025ba4%22&%24Louisville=%223d8aa5c6-1689-436a-86ee-15d81f117976%22&%24Huntington=%22f8c9adfb-4380-4afd-8d03-7e74454a946a%22
+
+*[_type=="district" && references($Ohio)]{district_long_name,districtLock[]->{lock_name,river_mile}}
+
+**** Results
+[
+  {
+    "districtLock": [
+      {
+        "lock_name": "Green River Lock & Dam 2",
+        "river_mile": 63.1
+      },
+      {
+        "lock_name": "McAlpine",
+        "river_mile": 606.8
+      },
+      {
+        "lock_name": "Markland",
+        "river_mile": 531.5
+      },
+      {
+        "lock_name": "John T. Myers",
+        "river_mile": 846
+      },
+      {
+        "lock_name": "Newburgh",
+        "river_mile": 776.1
+      },
+      {
+        "lock_name": "Cannelton",
+        "river_mile": 720.7
+      },
+      {
+        "lock_name": "Green River Lock & Dam 1",
+        "river_mile": 9.1
+      },
+      {
+        "lock_name": "Smithland",
+        "river_mile": 918.5
+      },
+      {
+        "lock_name": "Olmsted",
+        "river_mile": 964.4
+      }
+    ],
+    "district_long_name": "Louisville"
+  },
+  {
+    "districtLock": [
+      {
+        "lock_name": "Marmet",
+        "river_mile": 67.7
+      },
+      {
+        "lock_name": "Greenup",
+        "river_mile": 341
+      },
+      {
+        "lock_name": "Willow Island",
+        "river_mile": 161.7
+      },
+      {
+        "lock_name": "Meldahl",
+        "river_mile": 436.2
+      },
+      {
+        "lock_name": "Belleville",
+        "river_mile": 203.9
+      },
+      {
+        "lock_name": "London",
+        "river_mile": 82.8
+      },
+      {
+        "lock_name": "Winfield",
+        "river_mile": 31.1
+      },
+      {
+        "lock_name": "Robert C. Byrd",
+        "river_mile": 279.2
+      },
+      {
+        "lock_name": "Racine ",
+        "river_mile": 237.5
+      }
+    ],
+    "district_long_name": "Huntington"
+  }
+]

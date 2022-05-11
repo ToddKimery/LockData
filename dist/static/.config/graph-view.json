@@ -1,0 +1,7 @@
+// {
+//   "query": "*[_type in ['a', 'b']]"
+// }
+
+{
+  "query": "*[_type in ['lock']] {\"title\": select(_type == 'lock' => lock_name) }"
+}
